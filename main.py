@@ -15,6 +15,11 @@ arguments.add_argument('-i --interactive', dest='interactive', default=False, co
 arguments.add_argument('-s --save', dest='save', default=False, help='Save the stdout in a file', const='', nargs='?')
 arguments.add_argument('-p --path', dest='path', help='Inform the path to save the file')
 
+try:
+    os.mkdir('decrypt')
+except:
+    pass
+
 class crypt_end_decrypt:
     def __init__(self):
         parse = arguments.parse_args()
@@ -24,6 +29,13 @@ class crypt_end_decrypt:
             if action == 'r' or action == 'read':
                 self.write = False
                 self.read = str(input('Path: '))
+                self.save = True if str(input('Save the output? [y/n]')) == 'y' else False
+                if self.save:
+                    path = str(input('Path to save: [path/default]'))
+                    if path.lower().strip() == 'default':    
+                        self.path = 'decrypt/decrypt_file.txt' 
+                    else:
+                        self.path = path
             elif action == 'w' or action == 'write':
                 self.reading = False
                 self.write = str(input('Message: '))
@@ -46,7 +58,7 @@ class crypt_end_decrypt:
             if parse.save == '' or parse.save:
                 self.save = True
                 if self.path == 'encrypt_data.txt':
-                    self.path = str(input('Path to save: '))
+                    self.path = 'decrypt/decrypt_file.txt'
                 else:
                     self.path = parse.save
             else:
