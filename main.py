@@ -1,6 +1,7 @@
 from cryptography.fernet import Fernet
 import os
 import argparse
+import subprocess
 
 arguments = argparse.ArgumentParser()
 arguments.add_argument('-r --read -R - Read', action='store', dest='read', help='''
@@ -14,6 +15,7 @@ arguments.add_argument('-i --interactive', dest='interactive', default=False, co
                        help='Interactie mode')
 arguments.add_argument('-s --save', dest='save', default=False, help='Save the stdout in a file', const='', nargs='?')
 arguments.add_argument('-p --path', dest='path', help='Inform the path to save the file')
+arguments.add_argument('-ik --infokeys', dest='infokeys', help='Show all keys on keys folder', const='', nargs='?', default=False)
 
 try:
     os.mkdir('decrypt')
@@ -29,7 +31,7 @@ class crypt_end_decrypt:
         parse = arguments.parse_args()
         
         if parse.interactive or parse.interactive == '' or parse.interactive == ' ':
-            action = str(input('Action read or write? [w/r] ')).lower().strip()
+            action = str(input('Action read or write? [w/r/ik] ')).lower().strip()
             if action == 'r' or action == 'read':
                 self.write = False
                 self.read = str(input('Path: '))
@@ -52,10 +54,16 @@ class crypt_end_decrypt:
                 else:
                     print('Invalid action')
                     exit(0)
+            elif action == 'ik' or action == 'infokeys':
+                self.infokes()
+                exit(0)
             else:
                 print('Invalid action')
                 exit(0)
         else:
+            if parse.infokeys == '' or parse.infokeys:
+                self.infokes()
+                exit(0)
             self.path = parse.path if parse.path else 'encrypt_data.txt'
             self.write = parse.message if parse.message else False
             self.read = False if parse.read == '' else parse.read
@@ -112,7 +120,13 @@ class crypt_end_decrypt:
                 file.write(decrypt_data)
         else:
             print(decrypt_data.decode())
-            
+    
+    def infokes(self):
+        stdout = subprocess.check_output(['ls', 'keys']).decode().replace('\n', ', ').split(', ')
+        for x in range(0, len(stdout)):
+            if stdout[x]:
+                print(f'[{x}] {stdout[x]}')
+
 if __name__ == '__main__':
     start = crypt_end_decrypt()
     start.main()
