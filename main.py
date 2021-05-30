@@ -6,15 +6,31 @@ arguments = argparse.ArgumentParser()
 arguments.add_argument('-r --read -R - Read', action='store', dest='read', help='''
                        Read an encrypted message, you can pass the path to file or not, if not pass the path the script will read is data.txt file''',
                        const='',
-                       nargs='?')
+                       nargs='?',
+                       default=False)
 arguments.add_argument('-w --write -W --Write', dest='message', action='store', help='''
                        write a message encrypt''', required=False)
+arguments.add_argument('-i --interactive', dest='interactive', default=False, const='', nargs='?',
+                       help='Interactie mode')
 
 class crypt_end_decrypt:
     def __init__(self):
         parse = arguments.parse_args()
-        self.write = parse.message if parse.message else False
-        self.read = False if parse.read == '' else parse.read
+        
+        if parse.interactive or parse.interactive == '' or parse.interactive == ' ':
+            action = str(input('Action read or write? [w/r] ')).lower().strip()
+            if action == 'r' or action == 'read':
+                self.write = False
+                self.read = str(input('Path: '))
+            elif action == 'w' or action == 'write':
+                self.reading = False
+                self.write = str(input('Message: '))
+            else:
+                print('Invalid action')
+                exit(0)
+        else:
+            self.write = parse.message if parse.message else False
+            self.read = False if parse.read == '' else parse.read
 
     def generate_key(self):
         encrypt_key = Fernet.generate_key()            
@@ -54,7 +70,7 @@ class crypt_end_decrypt:
             secret = self.reading_secret()
             decrypt_data = secret.decrypt(file.read())
             print(decrypt_data.decode())
-
-if __name__ == "__main__":            
+            
+if __name__ == "__main__":
     start = crypt_end_decrypt()
     start.main()
