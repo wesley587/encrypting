@@ -40,10 +40,18 @@ class crypt_end_decrypt:
                 print('Invalid action')
                 exit(0)
         else:
-            self.save = parse.save if parse.save else False
             self.path = parse.path if parse.path else 'encrypt_data.txt'
             self.write = parse.message if parse.message else False
             self.read = False if parse.read == '' else parse.read
+            if parse.save == '' or parse.save:
+                self.save = True
+                if self.path == 'encrypt_data.txt':
+                    self.path = str(input('Path to save: '))
+                else:
+                    self.path = parse.save
+            else:
+                self.save = False
+
 
     def generate_key(self):
         encrypt_key = Fernet.generate_key()            
@@ -83,6 +91,10 @@ class crypt_end_decrypt:
         with open(path, 'rb') as file:
             secret = self.reading_secret()
             decrypt_data = secret.decrypt(file.read())
+        if self.save:
+            with open(self.path, 'wb') as file:
+                file.write(decrypt_data)
+        else:
             print(decrypt_data.decode())
             
 if __name__ == '__main__':
