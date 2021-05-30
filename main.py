@@ -12,6 +12,8 @@ arguments.add_argument('-w --write -W --Write', dest='message', action='store', 
                        write a message encrypt''', required=False)
 arguments.add_argument('-i --interactive', dest='interactive', default=False, const='', nargs='?',
                        help='Interactie mode')
+arguments.add_argument('-s --save', dest='save', default=False, help='Save the stdout in a file', const='', nargs='?')
+arguments.add_argument('-p --path', dest='path', help='Inform the path to save the file')
 
 class crypt_end_decrypt:
     def __init__(self):
@@ -25,10 +27,21 @@ class crypt_end_decrypt:
             elif action == 'w' or action == 'write':
                 self.reading = False
                 self.write = str(input('Message: '))
+                validation = str(input('save in a expecify path or not? [y/n]')).lower().strip()[0]
+                if validation == 'y' or validation == 'n':
+                    if validation == 'y':
+                        self.path = str(input('Path to save file, you can pass '))
+                    else:
+                        self.path = 'encrypt_data.txt'
+                else:
+                    print('Invalid action')
+                    exit(0)
             else:
                 print('Invalid action')
                 exit(0)
         else:
+            self.save = parse.save if parse.save else False
+            self.path = parse.path if parse.path else 'encrypt_data.txt'
             self.write = parse.message if parse.message else False
             self.read = False if parse.read == '' else parse.read
 
@@ -57,7 +70,8 @@ class crypt_end_decrypt:
 
     def encrypt_msg(self):
         secret = self.reading_secret()
-        with open('encrypt_data.txt', 'wb') as file:
+        print(self.path)
+        with open(self.path, 'wb') as file:
             encrypt_data = secret.encrypt(self.write.encode())
             file.write(encrypt_data)
     
@@ -71,6 +85,6 @@ class crypt_end_decrypt:
             decrypt_data = secret.decrypt(file.read())
             print(decrypt_data.decode())
             
-if __name__ == "__main__":
+if __name__ == '__main__':
     start = crypt_end_decrypt()
     start.main()
