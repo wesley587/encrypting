@@ -19,6 +19,10 @@ try:
     os.mkdir('decrypt')
 except:
     pass
+try:
+    os.mkdir('keys')
+except:
+    pass
 
 class crypt_end_decrypt:
     def __init__(self):
@@ -67,7 +71,7 @@ class crypt_end_decrypt:
 
     def generate_key(self):
         encrypt_key = Fernet.generate_key()            
-        with open('secret.key', 'wb') as file:
+        with open('keys/secret.key', 'wb') as file:
             file.write(encrypt_key)
         
 
@@ -84,7 +88,7 @@ class crypt_end_decrypt:
         self.encrypt_msg() if self.write else self.decrypt_msg()
          
     def reading_secret(self):
-        with open('secret.key', 'rb') as file:
+        with open('keys/secret.key', 'rb') as file:
             secret = Fernet(file.read())
         return secret
 
