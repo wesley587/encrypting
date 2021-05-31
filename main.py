@@ -2,6 +2,7 @@ from cryptography.fernet import Fernet
 import os
 import argparse
 import subprocess
+from datetime import datetime
 
 arguments = argparse.ArgumentParser()
 arguments.add_argument('-r --read -R - Read', action='store', dest='read', help='''
@@ -15,7 +16,8 @@ arguments.add_argument('-i --interactive', dest='interactive', default=False, co
                        help='Interactie mode')
 arguments.add_argument('-s --save', dest='save', default=False, help='Save the stdout in a file', const='', nargs='?')
 arguments.add_argument('-p --path', dest='path', help='Inform the path to save the file')
-arguments.add_argument('-ik --infokeys', dest='infokeys', help='Show all keys on keys folder', const='', nargs='?', default=False)
+arguments.add_argument('-nk --numkeys', dest='numkeys', help='Show all keys on keys folder', const='', nargs='?', default=False)
+arguments.add_argument('-g -generatekey', dest='new_key', nargs='?', const='', help='Generate new key value')
 
 try:
     os.mkdir('decrypt')
@@ -31,7 +33,7 @@ class crypt_end_decrypt:
         parse = arguments.parse_args()
         
         if parse.interactive or parse.interactive == '' or parse.interactive == ' ':
-            action = str(input('Action read or write? [w/r/ik] ')).lower().strip()
+            action = str(input('Action read or write? [w/r/nk/g] ')).lower().strip()
             if action == 'r' or action == 'read':
                 self.write = False
                 self.read = str(input('Path: '))
@@ -54,15 +56,21 @@ class crypt_end_decrypt:
                 else:
                     print('Invalid action')
                     exit(0)
-            elif action == 'ik' or action == 'infokeys':
+            elif action == 'nk' or action == 'numkeys':
                 self.infokes()
+                exit(0)
+            elif action == 'g' or action == 'generatekey':
+                self.generate_key()
                 exit(0)
             else:
                 print('Invalid action')
                 exit(0)
         else:
-            if parse.infokeys == '' or parse.infokeys:
-                self.infokes()
+            if parse.numkeys == '' or parse.numkeys or parse.new_key == '' or parse.new_key:
+                if parse.numkeys == '' or parse.numkeys:
+                    self.infokes()
+                elif parse.new_key == '' or parse.new_key:
+                    self.generate_key()
                 exit(0)
             self.path = parse.path if parse.path else 'encrypt_data.txt'
             self.write = parse.message if parse.message else False
@@ -80,6 +88,9 @@ class crypt_end_decrypt:
     def generate_key(self):
         encrypt_key = Fernet.generate_key()            
         with open('keys/secret.key', 'wb') as file:
+            file.write(encrypt_key)
+        date = datetime.now().strftime('%d-%m-%y %H:%M:%S.key')
+        with open(f'keys/{date}', 'wb') as file:
             file.write(encrypt_key)
         
 
