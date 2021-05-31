@@ -106,6 +106,10 @@ class crypt_end_decrypt:
                 os.mkdir('keys')
             except:
                 pass
+            try:
+                os.mkdir('encrypt_folder')
+            except:
+                pass
             with open(os.path.basename(__file__), 'r') as file:
                 content = file.read()
                 
@@ -126,13 +130,13 @@ class crypt_end_decrypt:
     def encrypt_msg(self):
         secret = self.reading_secret()
         print(self.path)
-        with open(self.path, 'wb') as file:
+        with open(f'encrypt_folder/{self.path}', 'wb') as file:
             encrypt_data = secret.encrypt(self.write.encode())
             file.write(encrypt_data)
     
     def decrypt_msg(self):
         if self.read == 'default':
-            path = 'encrypt_data.txt'
+            path = 'encrypt_folder/encrypt_data.txt'
         else:
             path = self.read
         with open(path, 'rb') as file:
