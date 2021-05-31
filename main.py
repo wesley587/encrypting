@@ -36,7 +36,7 @@ class crypt_end_decrypt:
                 if self.save:
                     path = str(input('Path to save: [path/default]'))
                     if path.lower().strip() == 'default':    
-                        self.path = 'decrypt/decrypt_file.txt' 
+                        self.path = 'decrypt_folder/decrypt_file.txt' 
                     else:
                         self.path = path
             elif action == 'w' or action == 'write':
@@ -79,7 +79,7 @@ class crypt_end_decrypt:
             if parse.save == '' or parse.save:
                 self.save = True
                 if self.path == 'encrypt_data.txt':
-                    self.path = 'decrypt/decrypt_file.txt'
+                    self.path = 'decrypt_folder/decrypt_file.txt'
                 else:
                     self.path = parse.save
             else:
@@ -99,7 +99,7 @@ class crypt_end_decrypt:
         first_execution = True
         if first_execution:
             try:
-                os.mkdir('decrypt')
+                os.mkdir('decrypt_folder')
             except:
                 pass
             try:
