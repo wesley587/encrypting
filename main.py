@@ -74,7 +74,7 @@ class crypt_end_decrypt:
                 exit(0)
             self.path = parse.path if parse.path else 'encrypt_data.txt'
             self.write = parse.message if parse.message else False
-            self.read = False if parse.read == '' else parse.read
+            self.read = 'default' if parse.read == '' else parse.read
             if parse.save == '' or parse.save:
                 self.save = True
                 if self.path == 'encrypt_data.txt':
@@ -104,7 +104,10 @@ class crypt_end_decrypt:
                 file.write(content.replace('first_execution = True', 'first_execution = False'))
 
             self.generate_key()
-        self.encrypt_msg() if self.write else self.decrypt_msg()
+        if self.write:
+            self.encrypt_msg()    
+        elif self.read:
+            self.decrypt_msg()
          
     def reading_secret(self):
         with open('keys/secret.key', 'rb') as file:
@@ -119,7 +122,7 @@ class crypt_end_decrypt:
             file.write(encrypt_data)
     
     def decrypt_msg(self):
-        if not self.read:
+        if self.read == 'default':
             path = 'encrypt_data.txt'
         else:
             path = self.read
