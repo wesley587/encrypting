@@ -26,7 +26,6 @@ class crypt_end_decrypt:
         self.date = datetime.now().strftime('%d-%m-%y %H:%M:%S.key')
 
         if parse.interactive or parse.interactive == '' or parse.interactive == ' ':
-            self.exist = False
             action = str(input('Action read or write? [w/r/nk/g/e] ')).lower().strip()
             if action == 'r' or action == 'read':
                 keys = self.infokes(storage=True)
@@ -62,6 +61,13 @@ class crypt_end_decrypt:
             elif action == 'g' or action == 'generatekey':
                 self.generate_key()
                 exit(0)
+            elif action == 'e':
+                self.exist = True
+                self.path = str(input('File path: '))
+                keys = self.infokes(storage=True)
+                key = str(input('Key num:'))
+                self.num_key = {'default': v for k, v in keys.items() if k == key}['default']                 
+                
             else:
                 print('Invalid action')
                 exit(0)
