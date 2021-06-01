@@ -20,6 +20,7 @@ arguments.add_argument('-nk --numkeys', dest='numkeys', help='Show all keys on k
 arguments.add_argument('-g --generatekey', dest='new_key', nargs='?', const='', help='Generate new key value')
 arguments.add_argument('-k --key', default='secret.key', dest='key', help='Ke that project will use..')
 arguments.add_argument('-e --exist', default=False, dest='exist', help='Encrypt using a exist file', nargs='?', const=True)
+arguments.add_argument('-f --folder', default=False, dest='folder', const=False, nargs='?', help='Used to emcrypt a folder')
 class crypt_end_decrypt:
     def __init__(self):
         parse = arguments.parse_args()
@@ -27,7 +28,8 @@ class crypt_end_decrypt:
 
         if parse.interactive or parse.interactive == '' or parse.interactive == ' ':
             self.exist = False
-            action = str(input('Action read or write? [w/r/nk/g/e] ')).lower().strip()
+            self.folder = False
+            action = str(input('Action read or write? [w/r/nk/g/e/f] ')).lower().strip()
             if action == 'r' or action == 'read':
                 keys = self.infokes(storage=True)
                 key = str(input('Key num:'))
@@ -68,7 +70,22 @@ class crypt_end_decrypt:
                 keys = self.infokes(storage=True)
                 key = str(input('Key num:'))
                 self.num_key = {'default': v for k, v in keys.items() if k == key}['default']                 
-                
+            elif action == 'f' or action == 'folder':
+                self.exist = False
+                action2 = str(input('Encripty ou decripty? [e/d] ')).lower().strip()[0]
+                self.path = str(input('folder path: '))
+                self.folder = True
+                keys = self.infokes(storage=True)
+                key = str(input('Key num:'))
+                self.num_key = {'default': v for k, v in keys.items() if k == key}['default']
+                if action2 == 'd':
+                    self.folder_action = 'd'
+                    self.save = True
+                elif action2 == 'e':
+                    self.folder_action = 'e'
+                else:
+                    print('error')
+                    exit(0)
             else:
                 print('Invalid action')
                 exit(0)
@@ -79,6 +96,8 @@ class crypt_end_decrypt:
                 elif parse.new_key == '' or parse.new_key:
                     self.generate_key()
                 exit(0)
+            print(parse)
+            self.folder = True if parse.folder else False
             self.exist = True if parse.exist == '' or parse.exist else False
             keys = self.infokes(show=False, storage=True)
             self.num_key = {'default': v for k, v in keys.items() if k == parse.key}['default'] if parse.key != 'secret.key' else parse.key
@@ -128,6 +147,8 @@ class crypt_end_decrypt:
             self.generate_key()
         if self.exist:
             self.encrypt_file()
+        if self.folder:
+            self.encrypt_folders()
         elif self.write:
             self.encrypt_msg()    
         elif self.read:
@@ -180,7 +201,19 @@ class crypt_end_decrypt:
             self.encrypt_msg(path=True)
         else:
             print('Pass the -p parram to inform the path of file')
-
+    
+    def encrypt_folders(self):
+        for root, folder, files in os.walk(self.path):
+            for file in files:
+                self.path = f'{root}/{file}'
+                if self.folder_action == 'e':
+                    self.encrypt_file()
+                elif self.folder_action == 'd':
+                    self.read = f'{root}/{file}'
+                    self.decrypt_msg()
+                else:
+                    print('kskk')
+                
 if __name__ == '__main__':
     start = crypt_end_decrypt()
     start.main()
