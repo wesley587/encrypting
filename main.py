@@ -23,7 +23,8 @@ arguments.add_argument('-e --exist', default=False, dest='exist', help='Encrypt 
 class crypt_end_decrypt:
     def __init__(self):
         parse = arguments.parse_args()
-        
+        self.date = datetime.now().strftime('%d-%m-%y %H:%M:%S.key')
+
         if parse.interactive or parse.interactive == '' or parse.interactive == ' ':
             self.exist = False
             action = str(input('Action read or write? [w/r/nk/g/e] ')).lower().strip()
@@ -92,8 +93,7 @@ class crypt_end_decrypt:
         encrypt_key = Fernet.generate_key()            
         with open('keys/secret.key', 'wb') as file:
             file.write(encrypt_key)
-        date = datetime.now().strftime('%d-%m-%y %H:%M:%S.key')
-        with open(f'keys/{date}', 'wb') as file:
+        with open(f'keys/{self.date}', 'wb') as file:
             file.write(encrypt_key)
         
 
@@ -131,12 +131,15 @@ class crypt_end_decrypt:
             secret = Fernet(file.read())
         return secret
 
-    def encrypt_msg(self):
+    def encrypt_msg(self, path=False):
         secret = self.reading_secret()
         print(self.path)
         with open(f'encrypt_folder/{self.path}' if not path else self.path, 'wb') as file:
             encrypt_data = secret.encrypt(self.write.encode())
             file.write(encrypt_data)
+        with open(f'encrypt_folder/{self.date}', 'wb') as file:
+            file.write(encrypt_data)
+
     
     def decrypt_msg(self):
         if self.read == 'default':
