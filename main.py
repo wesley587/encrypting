@@ -15,7 +15,7 @@ arguments.add_argument('-w --write -W --Write', dest='message', action='store', 
 arguments.add_argument('-i --interactive', dest='interactive', default=False, const='', nargs='?',
                        help='Interactie mode')
 arguments.add_argument('-s --save', dest='save', default=False, help='Save the stdout in a file', const='', nargs='?')
-arguments.add_argument('-p --path', dest='path', help='Inform the path to save the file')
+arguments.add_argument('-p --path', dest='path', help='Inform the path to save the file', action='store')
 arguments.add_argument('-nk --numkeys', dest='numkeys', help='Show all keys on keys folder', const='', nargs='?', default=False)
 arguments.add_argument('-g --generatekey', dest='new_key', nargs='?', const='', help='Generate new key value')
 arguments.add_argument('-k --key', default='secret.key', dest='key', help='Ke that project will use..')
@@ -72,9 +72,8 @@ class crypt_end_decrypt:
                 self.num_key = {'default': v for k, v in keys.items() if k == key}['default']                 
             elif action == 'f' or action == 'folder':
                 self.exist = False
-                action2 = str(input('Encripty ou decripty? [e/d] ')).lower().strip()[0]
                 self.path = str(input('folder path: '))
-                self.folder = True
+                self.folder = str(input('Encripty ou decripty? [e/d] ')).lower().strip()[0]
                 keys = self.infokes(storage=True)
                 key = str(input('Key num:'))
                 self.num_key = {'default': v for k, v in keys.items() if k == key}['default']
@@ -96,8 +95,7 @@ class crypt_end_decrypt:
                 elif parse.new_key == '' or parse.new_key:
                     self.generate_key()
                 exit(0)
-            print(parse)
-            self.folder = True if parse.folder else False
+            self.folder = parse.folder if parse.folder else False
             self.exist = True if parse.exist == '' or parse.exist else False
             keys = self.infokes(show=False, storage=True)
             self.num_key = {'default': v for k, v in keys.items() if k == parse.key}['default'] if parse.key != 'secret.key' else parse.key
@@ -206,13 +204,11 @@ class crypt_end_decrypt:
         for root, folder, files in os.walk(self.path):
             for file in files:
                 self.path = f'{root}/{file}'
-                if self.folder_action == 'e':
+                if self.folder[0] == 'e':
                     self.encrypt_file()
-                elif self.folder_action == 'd':
+                elif self.folder[0] == 'd':
                     self.read = f'{root}/{file}'
                     self.decrypt_msg()
-                else:
-                    print('kskk')
                 
 if __name__ == '__main__':
     start = crypt_end_decrypt()
