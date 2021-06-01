@@ -26,6 +26,7 @@ class crypt_end_decrypt:
         self.date = datetime.now().strftime('%d-%m-%y %H:%M:%S.key')
 
         if parse.interactive or parse.interactive == '' or parse.interactive == ' ':
+            self.exist = False
             action = str(input('Action read or write? [w/r/nk/g/e] ')).lower().strip()
             if action == 'r' or action == 'read':
                 keys = self.infokes(storage=True)
