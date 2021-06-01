@@ -19,13 +19,14 @@ arguments.add_argument('-p --path', dest='path', help='Inform the path to save t
 arguments.add_argument('-nk --numkeys', dest='numkeys', help='Show all keys on keys folder', const='', nargs='?', default=False)
 arguments.add_argument('-g --generatekey', dest='new_key', nargs='?', const='', help='Generate new key value')
 arguments.add_argument('-k --key', default='secret.key', dest='key', help='Ke that project will use..')
-
+arguments.add_argument('-e --exist', default=False, dest='exist', help='Encrypt using a exist file', nargs='?', const=True)
 class crypt_end_decrypt:
     def __init__(self):
         parse = arguments.parse_args()
         
         if parse.interactive or parse.interactive == '' or parse.interactive == ' ':
-            action = str(input('Action read or write? [w/r/nk/g] ')).lower().strip()
+            self.exist = False
+            action = str(input('Action read or write? [w/r/nk/g/e] ')).lower().strip()
             if action == 'r' or action == 'read':
                 keys = self.infokes(storage=True)
                 key = str(input('Key num:'))
@@ -70,6 +71,7 @@ class crypt_end_decrypt:
                 elif parse.new_key == '' or parse.new_key:
                     self.generate_key()
                 exit(0)
+            self.exist = True if parse.exist == '' or parse.exist else False
             keys = self.infokes(show=False, storage=True)
             self.num_key = {'default': v for k, v in keys.items() if k == parse.key}['default'] if parse.key != 'secret.key' else parse.key
             print(self.num_key)
@@ -117,7 +119,9 @@ class crypt_end_decrypt:
                 file.write(content.replace('first_execution = True', 'first_execution = False'))
 
             self.generate_key()
-        if self.write:
+        if self.exist:
+            self.encrypt_file()
+        elif self.write:
             self.encrypt_msg()    
         elif self.read:
             self.decrypt_msg()
@@ -130,7 +134,7 @@ class crypt_end_decrypt:
     def encrypt_msg(self):
         secret = self.reading_secret()
         print(self.path)
-        with open(f'encrypt_folder/{self.path}', 'wb') as file:
+        with open(f'encrypt_folder/{self.path}' if not path else self.path, 'wb') as file:
             encrypt_data = secret.encrypt(self.write.encode())
             file.write(encrypt_data)
     
@@ -159,6 +163,13 @@ class crypt_end_decrypt:
                     key_info[str(x)] = stdout[x]
         return key_info
 
+    def encrypt_file(self):
+        if self.path:
+            with open(self.path, 'r') as file:
+                self.write = file.read()
+            self.encrypt_msg(path=True)
+        else:
+            print('Pass the -p parram to inform the path of file')
 
 if __name__ == '__main__':
     start = crypt_end_decrypt()
