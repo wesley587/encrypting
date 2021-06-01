@@ -7,17 +7,17 @@ from datetime import datetime
 arguments = argparse.ArgumentParser()
 arguments.add_argument('-r --read -R - Read', action='store', dest='read', help='''
                        Read an encrypted message, you can pass the path to file or not, if not pass the path the script will read is data.txt file''',
-                       const='',
+                       const=True,
                        nargs='?',
                        default=False)
 arguments.add_argument('-w --write -W --Write', dest='message', action='store', help='''
                        write a message encrypt''', required=False)
-arguments.add_argument('-i --interactive', dest='interactive', default=False, const='', nargs='?',
+arguments.add_argument('-i --interactive', dest='interactive', default=False, const=True, nargs='?',
                        help='Interactie mode')
-arguments.add_argument('-s --save', dest='save', default=False, help='Save the stdout in a file', const='', nargs='?')
+arguments.add_argument('-s --save', dest='save', default=False, help='Save the stdout in a file', const=True, nargs='?')
 arguments.add_argument('-p --path', dest='path', help='Inform the path to save the file', action='store')
-arguments.add_argument('-nk --numkeys', dest='numkeys', help='Show all keys on keys folder', const='', nargs='?', default=False)
-arguments.add_argument('-g --generatekey', dest='new_key', nargs='?', const='', help='Generate new key value')
+arguments.add_argument('-nk --numkeys', dest='numkeys', help='Show all keys on keys folder', const=True, nargs='?', default=False)
+arguments.add_argument('-g --generatekey', dest='new_key', nargs='?', const=True, help='Generate new key value')
 arguments.add_argument('-k --key', default='secret.key', dest='key', help='Ke that project will use..')
 arguments.add_argument('-e --exist', default=False, dest='exist', help='Encrypt using a exist file', nargs='?', const=True)
 arguments.add_argument('-f --folder', default=False, dest='folder', const=False, nargs='?', help='Used to emcrypt a folder')
@@ -26,7 +26,7 @@ class crypt_end_decrypt:
         parse = arguments.parse_args()
         self.date = datetime.now().strftime('%d-%m-%y %H:%M:%S.key')
 
-        if parse.interactive or parse.interactive == '' or parse.interactive == ' ':
+        if parse.interactive:
             self.exist = False
             self.folder = False
             action = str(input('Action read or write? [w/r/nk/g/e/f] ')).lower().strip()
@@ -89,12 +89,13 @@ class crypt_end_decrypt:
                 print('Invalid action')
                 exit(0)
         else:
-            if parse.numkeys == '' or parse.numkeys or parse.new_key == '' or parse.new_key:
-                if parse.numkeys == '' or parse.numkeys:
+            if parse.numkeys or parse.new_key:
+                if parse.numkeys:
                     self.infokes()
-                elif parse.new_key == '' or parse.new_key:
+                elif parse.new_key:
                     self.generate_key()
                 exit(0)
+            print(parse)
             self.folder = parse.folder if parse.folder else False
             self.exist = True if parse.exist == '' or parse.exist else False
             keys = self.infokes(show=False, storage=True)
@@ -102,8 +103,8 @@ class crypt_end_decrypt:
             print(self.num_key)
             self.path = parse.path if parse.path else 'encrypt_data.txt'
             self.write = parse.message if parse.message else False
-            self.read = 'default' if parse.read == '' else parse.read
-            if parse.save == '' or parse.save:
+            self.read = 'default' if parse.read else parse.read
+            if parse.save:
                 self.save = True
                 if self.path == 'encrypt_data.txt':
                     self.path = 'decrypt_folder/decrypt_file.txt'
