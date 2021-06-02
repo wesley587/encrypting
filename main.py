@@ -23,11 +23,17 @@ arguments.add_argument('-e --exist', default=False, dest='exist', help='Encrypt 
 arguments.add_argument('-f --folder', default=False, dest='folder', const=False, nargs='?', help='Used to emcrypt a folder')
 class crypt_end_decrypt:
     def __init__(self):
-        self.date = datetime.now().strftime('%d-%m-%y %H:%M:%S')
-        self.control = self.generate_dict()        
-        
-    def generate_dict(self):
         parse = arguments.parse_args()
+        self.parse_args(parse)
+        self.date = datetime.now().strftime('%d-%m-%y %H:%M:%S')
+        self.control = self.generate_dict(parse)    
+    
+    def parse_args(self, parse):
+        if parse.message and parse.read or parse.interactive and parse.message or parse.interactive and parse.read or parse.numkeys and parse.message or parse.numkeys and parse.interactive:
+            print('Invalid arguments')
+            exit(0)
+        
+    def generate_dict(self, parse):
         values_dict = dict()
         if parse.interactive:
             keys = self.infokes(storage=True)
@@ -222,4 +228,3 @@ class crypt_end_decrypt:
 if __name__ == '__main__':
     start = crypt_end_decrypt()
     start.main()
-
