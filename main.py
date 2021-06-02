@@ -48,6 +48,7 @@ class crypt_end_decrypt:
         self.parse_args(parse)
         self.date = datetime.now().strftime('%d-%m-%y %H:%M:%S')
         self.control = self.generate_dict(parse) 
+        print(self.control)   
     
     def parse_args(self, parse):
         if parse.message and parse.read or parse.interactive and parse.message or parse.interactive and parse.read or parse.numkeys and parse.message or parse.numkeys and parse.interactive:
@@ -129,6 +130,7 @@ class crypt_end_decrypt:
                 values_dict['folder_path'] = parse.path
             elif parse.exist:
                 values_dict['action'] = 'existing file'
+                values_dict['path_to_read'] = values_dict['path_to_save'] = parse.path
             elif parse.message:
                 values_dict['action'] = 'write'
                 values_dict['content'] = parse.message
@@ -163,7 +165,7 @@ class crypt_end_decrypt:
     def main(self):
         if self.control['action']:
             if self.control['action'] == 'existing file':
-                self.encrypt_file()
+                self.encrypt_file(path=False)
             if self.control['action'] == 'folder':
                 self.encrypt_folders()
             if self.control['action'] == 'write':
@@ -179,11 +181,12 @@ class crypt_end_decrypt:
         return secret
 
     def encrypt_msg(self, path=False):
+        
         secret = self.reading_secret()
         with open(self.control['path_to_save'], 'wb') as file:
             encrypt_data = secret.encrypt(self.control['content'].encode())
             file.write(encrypt_data)
-        with open(f'encrypt_folder/{self.date}', 'wb') as file:
+        with open(f'encrypt_folder/{self.date}' if not path else f'encrypt_folder/{path}/{self.date}', 'wb') as file:
             file.write(encrypt_data)
 
     
@@ -212,21 +215,27 @@ class crypt_end_decrypt:
                     key_info[str(x)] = stdout[x]
         return key_info
 
-    def encrypt_file(self):
+    def encrypt_file(self, path=False):
         if self.control['path_to_read']:
             with open(self.control['path_to_read'], 'r') as file:
                 self.control['content'] = file.read()
-            self.encrypt_msg(path=True)
+            self.encrypt_msg() if not path else self.encrypt_msg(path)
+            
         else:
             print('Pass the -p parram to inform the path of file')
     
     def encrypt_folders(self):
-        for root, folder, files in os.walk(self.control['folder_path']):
+        folder = self.control['folder_path'][self.control['folder_path'].rfind('/'):]
+        for root, folders, files in os.walk(self.control['folder_path']):
+            self.control['date'] = datetime.now().strftime('%d-%m-%y %H:%M:%S:%f')
             for file in files:
                 self.control['path_to_read'] = self.control['path_to_save'] = f'{root}/{file}'
-                 
+                try:
+                    os.mkdir(f'encrypt_folder/{root[root.find(folder):]}')
+                except:
+                    print(f'encrypt_folder/{root[root.find(folder):]}')
                 if self.control['folder_action'] == 'encrypt':
-                    self.encrypt_file()
+                    self.encrypt_file(path=root[root.find(folder):])
                 elif self.control['folder_action'] == 'decrypt':
                     self.read = f'{root}/{file}'
                     self.decrypt_msg()
