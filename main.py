@@ -15,7 +15,7 @@ arguments.add_argument('-w --write -W --Write', dest='message', action='store', 
 arguments.add_argument('-i --interactive', dest='interactive', default=False, const=True, nargs='?',
                        help='Interactie mode')
 arguments.add_argument('-s --save', dest='save', default=False, help='Save the stdout in a file', const=True, nargs='?')
-arguments.add_argument('-p --path', dest='path', help='Inform the path to save the file', action='store')
+arguments.add_argument('-p --path', dest='path', help='Inform the path to save the file', action='store', default=False)
 arguments.add_argument('-nk --numkeys', dest='numkeys', help='Show all keys on keys folder', const=True, nargs='?', default=False)
 arguments.add_argument('-g --generatekey', dest='new_key', nargs='?', const=True, help='Generate new key value')
 arguments.add_argument('-k --key', default='secret.key', dest='key', help='Ke that project will use..')
@@ -23,65 +23,58 @@ arguments.add_argument('-e --exist', default=False, dest='exist', help='Encrypt 
 arguments.add_argument('-f --folder', default=False, dest='folder', const=False, nargs='?', help='Used to emcrypt a folder')
 class crypt_end_decrypt:
     def __init__(self):
+        self.date = datetime.now().strftime('%d-%m-%y %H:%M:%S')
+        self.control = self.generate_dict()        
+        
+    def generate_dict(self):
         parse = arguments.parse_args()
-        self.date = datetime.now().strftime('%d-%m-%y %H:%M:%S.key')
-
+        values_dict = dict()
         if parse.interactive:
+            keys = self.infokes(storage=True)
+            key = str(input('Key num:'))
+            values_dict['key'] = {'default': v for k, v in keys.items() if k == key}['default'] 
+            action = str(input('Action read or write? [w/r/n/g/e/f] ')).lower().strip()[0]
             self.exist = False
             self.folder = False
-            action = str(input('Action read or write? [w/r/nk/g/e/f] ')).lower().strip()
-            if action == 'r' or action == 'read':
-                keys = self.infokes(storage=True)
-                key = str(input('Key num:'))
-                self.num_key = {'default': v for k, v in keys.items() if k == key}['default'] 
+            if action == 'r':
+                values_dict['action'] = 'read'
                 self.write = False
-                self.read = str(input('Path: '))
-                self.save = True if str(input('Save the output? [y/n]')) == 'y'  else False
-                if self.save:
+                values_dict['path_to_read'] = str(input('Path: '))
+                values_dict['save_output'] = True if str(input('Save the output? [y/n]')).lower().strip()[0] == 'y'  else False
+                if values_dict['save_output']:
                     path = str(input('Path to save: [path/default]'))
                     if path.lower().strip() == 'default':    
-                        self.path = 'decrypt_folder/decrypt_file.txt' 
+                        values_dict['path_to_save'] = f'decrypt_folder/{self.date}.txt' 
                     else:
-                        self.path = path
-            elif action == 'w' or action == 'write':
-                keys = self.infokes(storage=True)
-                key = str(input('Key num:'))
-                self.num_key = {'default': v for k, v in keys.items() if k == key}['default'] 
+                        values_dict['path_to_save'] = path
+            elif action == 'w': 
+                values_dict['action'] = 'write'
                 self.reading = False
-                self.write = str(input('Message: '))
-                validation = str(input('save in a expecify path or not? [y/n]')).lower().strip()[0]
-                if validation == 'y' or validation == 'n':
-                    if validation == 'y':
-                        self.path = str(input('Path to save file, you can pass '))
-                    else:
-                        self.path = 'encrypt_data.txt'
+                values_dict['content'] = str(input('Message: '))
+                values_dict['save_output'] = True if str(input('save in a expecify path or not? [y/n]')).lower().strip()[0] == 'y'  else False
+                if values_dict['save_output']:
+                    values_dict['path_to_save'] = str(input('Path to save file, you can pass '))
                 else:
-                    print('Invalid action')
-                    exit(0)
-            elif action == 'nk' or action == 'numkeys':
+                    values_dict['path_to_save'] = 'encrypt_folder/encrypt_data.txt'
+            elif action == 'n':
                 self.infokes()
                 exit(0)
-            elif action == 'g' or action == 'generatekey':
+            elif action == 'g':
                 self.generate_key()
                 exit(0)
             elif action == 'e':
-                self.exist = True
-                self.path = str(input('File path: '))
-                keys = self.infokes(storage=True)
-                key = str(input('Key num:'))
-                self.num_key = {'default': v for k, v in keys.items() if k == key}['default']                 
+                values_dict['action'] = 'existing file'
+                values_dict['path_to_read'] = values_dict['path_to_save'] = str(input('File path: '))
             elif action == 'f' or action == 'folder':
+                values_dict['action'] = 'folder'
                 self.exist = False
-                self.path = str(input('folder path: '))
-                self.folder = str(input('Encripty ou decripty? [e/d] ')).lower().strip()[0]
-                keys = self.infokes(storage=True)
-                key = str(input('Key num:'))
-                self.num_key = {'default': v for k, v in keys.items() if k == key}['default']
-                if action2 == 'd':
-                    self.folder_action = 'd'
-                    self.save = True
-                elif action2 == 'e':
-                    self.folder_action = 'e'
+                values_dict['folder_path'] = str(input('folder path: '))
+                action = str(input('Encripty ou decripty? [e/d] ')).lower().strip()[0]
+                if action == 'd':
+                    values_dict['folder_action'] = 'decrypt'
+                    values_dict['save_output'] = True
+                elif action == 'e':
+                    values_dict['folder_action'] = 'encrypt'
                 else:
                     print('error')
                     exit(0)
@@ -89,36 +82,48 @@ class crypt_end_decrypt:
                 print('Invalid action')
                 exit(0)
         else:
+            keys = self.infokes(show=False, storage=True)
+            values_dict['key'] = {'default': v for k, v in keys.items() if k == parse.key}['default'] if parse.key != 'secret.key' else parse.key
+            values_dict['path_to_read'] = parse.path if parse.path else 'encrypt_data.txt'
+            
             if parse.numkeys or parse.new_key:
                 if parse.numkeys:
                     self.infokes()
-                elif parse.new_key:
+                if parse.new_key:
                     self.generate_key()
                 exit(0)
-            print(parse)
-            self.folder = parse.folder if parse.folder else False
-            self.exist = True if parse.exist == '' or parse.exist else False
-            keys = self.infokes(show=False, storage=True)
-            self.num_key = {'default': v for k, v in keys.items() if k == parse.key}['default'] if parse.key != 'secret.key' else parse.key
-            print(self.num_key)
-            self.path = parse.path if parse.path else 'encrypt_data.txt'
-            self.write = parse.message if parse.message else False
-            self.read = 'default' if parse.read else parse.read
-            if parse.save:
-                self.save = True
-                if self.path == 'encrypt_data.txt':
-                    self.path = 'decrypt_folder/decrypt_file.txt'
-                else:
-                    self.path = parse.save
-            else:
-                self.save = False
+            elif parse.folder:
+                values_dict['action'] = 'folder'
+            elif parse.exist:
+                values_dict['action'] = 'existing file'
+            elif parse.message:
+                values_dict['action'] = 'write'
+                values_dict['content'] = parse.message
+                values_dict['save_output'] = True if parse.save else False
+                values_dict['path_to_save'] = parse.path if parse.path else 'encrypt_folder/encrypt_data.txt'
 
+            
+                
+            elif parse.read:
+                values_dict['action'] = 'read'
+                values_dict['path_to_read'] = 'default' if parse.read else parse.read
+
+            if parse.save:
+                values_dict['save_output'] = True
+                if values_dict['path_to_read'] == 'encrypt_data.txt':
+                    values_dict['path_to_save'] = 'decrypt_folder/decrypt_file.txt'
+                else:
+                    values_dict['path_to_save'] = parse.path
+            else:
+                values_dict['save_output'] = False
+            
+        return values_dict
 
     def generate_key(self):
         encrypt_key = Fernet.generate_key()            
         with open('keys/secret.key', 'wb') as file:
             file.write(encrypt_key)
-        with open(f'keys/{self.date}', 'wb') as file:
+        with open(f'keys/{self.date}.key', 'wb') as file:
             file.write(encrypt_key)
         
 
@@ -144,40 +149,42 @@ class crypt_end_decrypt:
                 file.write(content.replace('first_execution = True', 'first_execution = False'))
 
             self.generate_key()
-        if self.exist:
-            self.encrypt_file()
-        if self.folder:
-            self.encrypt_folders()
-        elif self.write:
-            self.encrypt_msg()    
-        elif self.read:
-            self.decrypt_msg()
+        if self.control['action']:
+            if self.control['action'] == 'existing file':
+                self.encrypt_file()
+            if self.control['action'] == 'folder':
+                self.encrypt_folders()
+            if self.control['action'] == 'write':
+                self.encrypt_msg()    
+            elif self.control['action'] == 'read':
+                self.decrypt_msg()
+        else:
+            print('error...')
          
     def reading_secret(self):
-        with open(f'keys/{self.num_key}', 'rb') as file:
+        with open(f'keys/{self.control["key"]}', 'rb') as file:
             secret = Fernet(file.read())
         return secret
 
     def encrypt_msg(self, path=False):
         secret = self.reading_secret()
-        print(self.path)
-        with open(f'encrypt_folder/{self.path}' if not path else self.path, 'wb') as file:
-            encrypt_data = secret.encrypt(self.write.encode())
+        with open(self.control['path_to_save'], 'wb') as file:
+            encrypt_data = secret.encrypt(self.control['content'].encode())
             file.write(encrypt_data)
         with open(f'encrypt_folder/{self.date}', 'wb') as file:
             file.write(encrypt_data)
 
     
     def decrypt_msg(self):
-        if self.read == 'default':
+        if self.control['path_to_read'] == 'default':
             path = 'encrypt_folder/encrypt_data.txt'
         else:
-            path = self.read
+            path = self.control['path_to_read']
         with open(path, 'rb') as file:
             secret = self.reading_secret()
             decrypt_data = secret.decrypt(file.read())
-        if self.save:
-            with open(self.path, 'wb') as file:
+        if self.control['save_output']:
+            with open(self.control['path_to_save'], 'wb') as file:
                 file.write(decrypt_data)
         else:
             print(decrypt_data.decode())
@@ -194,23 +201,25 @@ class crypt_end_decrypt:
         return key_info
 
     def encrypt_file(self):
-        if self.path:
-            with open(self.path, 'r') as file:
-                self.write = file.read()
+        if self.control['path_to_read']:
+            with open(self.control['path_to_read'], 'r') as file:
+                self.control['content'] = file.read()
             self.encrypt_msg(path=True)
         else:
             print('Pass the -p parram to inform the path of file')
     
     def encrypt_folders(self):
-        for root, folder, files in os.walk(self.path):
+        for root, folder, files in os.walk(self.control['folder_path']):
             for file in files:
-                self.path = f'{root}/{file}'
-                if self.folder[0] == 'e':
+                self.control['path_to_read'] = self.control['path_to_save'] = f'{root}/{file}'
+                 
+                if self.control['folder_action'] == 'encrypt':
                     self.encrypt_file()
-                elif self.folder[0] == 'd':
+                elif self.control['folder_action'] == 'decrypt':
                     self.read = f'{root}/{file}'
                     self.decrypt_msg()
                 
 if __name__ == '__main__':
     start = crypt_end_decrypt()
     start.main()
+
