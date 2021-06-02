@@ -40,6 +40,7 @@ class crypt_and_decrypt:
         parse = arguments.parse_args()
         self.parse_args(parse)
         self.control = self.generate_dict(parse) 
+        print(self.control)
         self.generate_cache() 
     
     def parse_args(self, parse):
@@ -73,9 +74,7 @@ class crypt_and_decrypt:
     def generate_dict(self, parse):
         values_dict = dict()
         if parse.interactive:
-            keys = self.infokes(storage=True)
-            key = str(input('Key num:'))
-            values_dict['key'] = {'default': v for k, v in keys.items() if k == key}['default'] 
+            
             action = str(input('Action read or write? [w/r/n/g/e/f] ')).lower().strip()[0]
             self.exist = False
             self.folder = False
@@ -108,7 +107,7 @@ class crypt_and_decrypt:
             elif action == 'e':
                 values_dict['action'] = 'existing file'
                 values_dict['path_to_read'] = values_dict['path_to_save'] = str(input('File path: '))
-            elif action == 'f' or action == 'folder':
+            elif action == 'f':
                 values_dict['action'] = 'folder'
                 self.exist = False
                 values_dict['folder_path'] = str(input('folder path: '))
@@ -124,11 +123,11 @@ class crypt_and_decrypt:
             else:
                 print('Invalid action')
                 exit(0)
-        else:
-            keys = self.infokes(show=False, storage=True)
-            values_dict['key'] = {'default': v for k, v in keys.items() if k == parse.key}['default'] if parse.key != 'secret.key' else parse.key
-            values_dict['path_to_read'] = parse.path if parse.path else 'encrypt_data.txt'
-            
+            if values_dict['action'] == 'write' or values_dict['action'] == 'read' or values_dict['action'] == 'folder' or values_dict['action'] == 'existing file':
+                keys = self.infokes(storage=True)
+                key = str(input('Key num:'))
+                values_dict['key'] = {'default': v for k, v in keys.items() if k == key}['default'] 
+        else:            
             if parse.numkeys or parse.new_key:
                 if parse.numkeys:
                     self.infokes()
@@ -150,10 +149,7 @@ class crypt_and_decrypt:
                 values_dict['action'] = 'write'
                 values_dict['content'] = parse.message
                 values_dict['save_output'] = True if parse.save else False
-                values_dict['path_to_save'] = parse.path if parse.path else 'encrypt_folder/encrypt_data.txt'
-
-            
-                
+                values_dict['path_to_save'] = parse.path if parse.path else 'encrypt_folder/encrypt_data.txt'        
             elif parse.read:
                 values_dict['action'] = 'read'
                 values_dict['path_to_read'] = 'default' if parse.read else parse.read
@@ -166,6 +162,11 @@ class crypt_and_decrypt:
                     values_dict['path_to_save'] = parse.path
             else:
                 values_dict['save_output'] = False
+            if values_dict['action'] == 'write' or values_dict['action'] == 'read' or values_dict['action'] == 'folder' or values_dict['action'] == 'existing file':
+                keys = self.infokes(show=False, storage=True)
+                values_dict['key'] = {'default': v for k, v in keys.items() if k == parse.key}['default'] if parse.key != 'secret.key' else parse.key
+                values_dict['path_to_read'] = parse.path if parse.path else 'encrypt_data.txt'
+            
             
         return values_dict
 
