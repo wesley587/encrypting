@@ -1,9 +1,5 @@
 def __init__(self):
-    parse = arguments.parse_args()
-    if parse.interactive:
-        self.interactive = self.interactive()
-    else:
-        self.dict = self.generate_dict()
+    self.dict = self.generate_dict()
     
     
 def generate_dict():
@@ -92,3 +88,4 @@ def generate_dict():
                 values_dict['path_to_save'] = parse.save
         else:
             values_dict['save_output'] = False
+    return values_dict
