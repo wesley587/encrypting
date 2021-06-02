@@ -3,6 +3,7 @@ import os
 import argparse
 import subprocess
 from datetime import datetime
+from json import dumps
 
 arguments = argparse.ArgumentParser()
 arguments.add_argument('-r --read -R - Read', action='store', dest='read', help='''
@@ -25,20 +26,10 @@ arguments.add_argument('-f --folder', default=False, dest='folder', help='Used t
 
 class crypt_and_decrypt:
     def __init__(self):
+        self.date = datetime.now().strftime('%d-%m-%y %H:%M:%S')
         first_execution = True
         if first_execution:
-            try:
-                os.mkdir('decrypt_folder')
-            except:
-                pass
-            try:
-                os.mkdir('keys')
-            except:
-                pass
-            try:
-                os.mkdir('encrypt_folder')
-            except:
-                pass
+            self.generate_folders()
             with open(os.path.basename(__file__), 'r') as file:
                 content = file.read()
                 
@@ -48,14 +39,36 @@ class crypt_and_decrypt:
 
         parse = arguments.parse_args()
         self.parse_args(parse)
-        self.date = datetime.now().strftime('%d-%m-%y %H:%M:%S')
         self.control = self.generate_dict(parse) 
-        print(self.control)   
+        self.generate_cache() 
     
     def parse_args(self, parse):
         if parse.message and parse.read or parse.interactive and parse.message or parse.interactive and parse.read or parse.numkeys and parse.message or parse.numkeys and parse.interactive:
             print('Inalid arguments')
             exit(0)
+    
+    def generate_folders(self):
+        try:
+            os.mkdir('decrypt_folder')
+        except:
+            pass
+        try:
+            os.mkdir('keys')
+        except:
+            pass
+        try:
+            os.mkdir('encrypt_folder')
+        except:
+            pass
+        try:
+            os.mkdir('cache')
+        except:
+            pass
+    
+    def generate_cache(self):
+        data = dumps(self.control)
+        with open(f'cache/{self.date}.json', 'w') as file:
+            file.write(data)
         
     def generate_dict(self, parse):
         values_dict = dict()
