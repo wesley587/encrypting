@@ -21,6 +21,8 @@ arguments.add_argument('-g --generatekey', dest='new_key', nargs='?', const=True
 arguments.add_argument('-k --key', default='secret.key', dest='key', help='Ke that project will use..')
 arguments.add_argument('-e --exist', default=False, dest='exist', help='Encrypt using a exist file', nargs='?', const=True)
 arguments.add_argument('-f --folder', default=False, dest='folder', help='Used to emcrypt a folder')
+
+
 class crypt_and_decrypt:
     def __init__(self):
         first_execution = True
@@ -52,7 +54,7 @@ class crypt_and_decrypt:
     
     def parse_args(self, parse):
         if parse.message and parse.read or parse.interactive and parse.message or parse.interactive and parse.read or parse.numkeys and parse.message or parse.numkeys and parse.interactive:
-            print('Invalid arguments')
+            print('Inalid arguments')
             exit(0)
         
     def generate_dict(self, parse):
@@ -227,7 +229,6 @@ class crypt_and_decrypt:
     def encrypt_folders(self):
         folder = self.control['folder_path'][self.control['folder_path'].rfind('/'):]
         for root, folders, files in os.walk(self.control['folder_path']):
-            self.control['date'] = datetime.now().strftime('%d-%m-%y %H:%M:%S:%f')
             for file in files:
                 self.control['path_to_read'] = self.control['path_to_save'] = f'{root}/{file}'
                 try:
@@ -235,6 +236,7 @@ class crypt_and_decrypt:
                 except:
                     print(f'encrypt_folder/{root[root.find(folder):]}')
                 if self.control['folder_action'] == 'encrypt':
+                    self.date = datetime.now().strftime('%d-%m-%y %H:%M:%S:%f')
                     self.encrypt_file(path=root[root.find(folder):])
                 elif self.control['folder_action'] == 'decrypt':
                     self.read = f'{root}/{file}'
