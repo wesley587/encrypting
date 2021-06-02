@@ -21,7 +21,7 @@ arguments.add_argument('-g --generatekey', dest='new_key', nargs='?', const=True
 arguments.add_argument('-k --key', default='secret.key', dest='key', help='Ke that project will use..')
 arguments.add_argument('-e --exist', default=False, dest='exist', help='Encrypt using a exist file', nargs='?', const=True)
 arguments.add_argument('-f --folder', default=False, dest='folder', help='Used to emcrypt a folder')
-class crypt_end_decrypt:
+class crypt_and_decrypt:
     def __init__(self):
         first_execution = True
         if first_execution:
@@ -241,5 +241,5 @@ class crypt_end_decrypt:
                     self.decrypt_msg()
                 
 if __name__ == '__main__':
-    start = crypt_end_decrypt()
+    start = crypt_and_decrypt()
     start.main()
