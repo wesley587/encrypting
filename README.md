@@ -19,6 +19,7 @@ To start the use this project clone the [repos](ttps://github.com/wesley587/encr
 | r | Used to read a encrypt file | -r path [-s to save the output] [-k for use a specify key] |
 | e | Used to encrypt a existing file | -e -p path_to_file |
 | f | Folder active actions only allows for a foler use with -p | -f [e/d] -p [-s save the output] |
+| i | Active the interactive mode | -i |
 | p | Used to specify the path | -p |
 | s | Used to save the output | -s |
 | n | Used to see the Keys | -n |
