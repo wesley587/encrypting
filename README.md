@@ -28,6 +28,12 @@ To start the use this project clone the [repos](ttps://github.com/wesley587/encr
 
 Some examples using this project
 
+### Using the interactive mode
+
+```shell
+python3 main.py -i
+```
+
 ### Writing an encrypting file
 
 ```shell
