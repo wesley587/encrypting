@@ -1,5 +1,8 @@
+# Encrypting
 
-# what is Encrypting project
+![pgp-encryption-hero](https://user-images.githubusercontent.com/72465364/120722465-263bca80-c4a6-11eb-9b42-3be790f8b388.png)
+
+# What is Encrypting project
 
 Encrypt project is 100% writen in python language.
 
@@ -7,7 +10,7 @@ It's used for encrypt and decrypt files and folders.
 
 # usage
 
-To start the use this project clone the [repos](ttps://github.com/wesley587/encrypting/) or copy the [main.py](ttps://github.com/wesley587/encrypting/blob/main/main.py)
+To start the use this project clone the [repos](ttps://github.com/wesley587/encrypting) or copy the [main.py](ttps://github.com/wesley587/encrypting/blob/main/main.py)
 
 # Commands
 
