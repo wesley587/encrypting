@@ -40,7 +40,6 @@ class crypt_and_decrypt:
         parse = arguments.parse_args()
         self.parse_args(parse)
         self.control = self.generate_dict(parse) 
-        print(self.control)
         self.generate_cache() 
     
     def parse_args(self, parse):
@@ -141,7 +140,7 @@ class crypt_and_decrypt:
                 elif parse.folder.lower() == 'd' or parse.folder.lower() == 'decrypt':
                     values_dict['folder_action'] = 'decrypt'
                     values_dict['save_output'] = True
-                values_dict['folder_path'] = parse.path
+                values_dict['folder_path'] = values_dict['path_to_read'] = parse.path
             elif parse.exist:
                 values_dict['action'] = 'existing file'
                 values_dict['path_to_read'] = values_dict['path_to_save'] = parse.path
@@ -160,7 +159,7 @@ class crypt_and_decrypt:
                     values_dict['path_to_save'] = 'decrypt_folder/decrypt_file.txt'
                 else:
                     values_dict['path_to_save'] = parse.path
-            else:
+            elif not parse.save:
                 values_dict['save_output'] = False
             if values_dict['action'] == 'write' or values_dict['action'] == 'read' or values_dict['action'] == 'folder' or values_dict['action'] == 'existing file':
                 keys = self.infokes(show=False, storage=True)
@@ -206,17 +205,20 @@ class crypt_and_decrypt:
             file.write(encrypt_data)
 
     
-    def decrypt_msg(self):
+    def decrypt_msg(self, path=False):
         if self.control['path_to_read'] == 'default':
-            path = 'encrypt_folder/encrypt_data.txt'
+            file = 'encrypt_folder/encrypt_data.txt'
         else:
-            path = self.control['path_to_read']
-        with open(path, 'rb') as file:
+            file = self.control['path_to_read']
+        with open(file, 'rb') as file:
             secret = self.reading_secret()
             decrypt_data = secret.decrypt(file.read())
         if self.control['save_output']:
             with open(self.control['path_to_save'], 'wb') as file:
                 file.write(decrypt_data)
+            with open(f'decrypt_folder/{self.date}' if not path else f'decrypt_folder/{path}/{self.date}', 'wb') as file:
+                file.write(decrypt_data)            
+                
         else:
             print(decrypt_data.decode())
     
@@ -245,16 +247,20 @@ class crypt_and_decrypt:
         for root, folders, files in os.walk(self.control['folder_path']):
             for file in files:
                 self.control['path_to_read'] = self.control['path_to_save'] = f'{root}/{file}'
-                try:
-                    os.mkdir(f'encrypt_folder/{root[root.find(folder):]}')
-                except:
-                    print(f'encrypt_folder/{root[root.find(folder):]}')
                 if self.control['folder_action'] == 'encrypt':
+                    try:
+                        os.mkdir(f'encrypt_folder/{root[root.find(folder):]}')
+                    except:
+                        pass
                     self.date = datetime.now().strftime('%d-%m-%y %H:%M:%S:%f')
                     self.encrypt_file(path=root[root.find(folder):])
                 elif self.control['folder_action'] == 'decrypt':
+                    try:
+                        os.mkdir(f'decrypt_folder/{root[root.find(folder):]}')
+                    except:
+                        pass
                     self.read = f'{root}/{file}'
-                    self.decrypt_msg()
+                    self.decrypt_msg(path=root[root.find(folder):])
                 
 if __name__ == '__main__':
     start = crypt_and_decrypt()
