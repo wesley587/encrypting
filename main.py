@@ -260,6 +260,7 @@ class crypt_and_decrypt:
             file.write(encrypt_data)
         with open(f'encrypt_folder/{self.date}' if not path else f'encrypt_folder/{path}/{self.date}', 'wb') as file:
             file.write(encrypt_data)
+       
 
     
     def decrypt_msg(self, path=False):
@@ -302,8 +303,12 @@ class crypt_and_decrypt:
     def encrypt_file(self, path=False):
         print(f'Reading the file on : {Fore.LIGHTCYAN_EX + self.control["path_to_read"] + Style.RESET_ALL}')
         if self.control['path_to_read']:
-            with open(self.control['path_to_read'], 'r') as file:
-                self.control['content'] = file.read()
+            try:
+                with open(self.control['path_to_read'], 'r') as file:
+                    self.control['content'] = file.read()
+            except:
+                print(f'{Fore.RED + "ERROR, Impossible encrypt the file: " + Style.RESET_ALL + self.control["path_to_save"]}')
+
             self.encrypt_msg() if not path else self.encrypt_msg(path)
             
         else:
