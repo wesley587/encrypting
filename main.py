@@ -4,24 +4,19 @@ import argparse
 import subprocess
 from datetime import datetime
 from json import dumps
+from colorama import Back, Fore, Style
 
 arguments = argparse.ArgumentParser()
 arguments.add_argument('-r --read -R - Read', action='store', dest='read', help='''
-                       Read an encrypted message, you can pass the path to file or not, if not pass the path the script will read is data.txt file''',
-                       const=True,
-                       nargs='?',
-                       default=False)
-arguments.add_argument('-w --write -W --Write', dest='message', action='store', help='''
-                       write a message encrypt''', required=False)
-arguments.add_argument('-i --interactive', dest='interactive', default=False, const=True, nargs='?',
-                       help='Interactie mode')
+                       Read an encrypted file, it is possible to pass the path a file''', const=True, nargs='?', default=False)
+arguments.add_argument('-w --write -W --Write', dest='message', action='store', help='Write a message encrypt, pass the content', required=False)
+arguments.add_argument('-i --interactive', dest='interactive', default=False, const=True, nargs='?', help='Interactie mode')
 arguments.add_argument('-s --save', dest='save', default=False, help='Save the stdout in a file', const=True, nargs='?')
-arguments.add_argument('-p --path', dest='path', help='Inform the path to save the file', action='store', default=False)
-arguments.add_argument('-nk --numkeys', dest='numkeys', help='Show all keys on keys folder', const=True, nargs='?', default=False)
+arguments.add_argument('-p --path', dest='path', help='Inform the path to do something', const=True, nargs='?', default=False)
 arguments.add_argument('-g --generatekey', dest='new_key', nargs='?', const=True, help='Generate new key value')
-arguments.add_argument('-k --key', default='secret.key', dest='key', help='Ke that project will use..')
+arguments.add_argument('-k --key', default='secret.key', dest='key', help='Key that will be used in the process')
 arguments.add_argument('-e --exist', default=False, dest='exist', help='Encrypt using a exist file', nargs='?', const=True)
-arguments.add_argument('-f --folder', default=False, dest='folder', help='Used to emcrypt a folder')
+arguments.add_argument('-f --folder', default=False, dest='folder', help='Used to encrypt or decrypt a folder')
 
 
 class crypt_and_decrypt:
@@ -40,28 +35,34 @@ class crypt_and_decrypt:
         parse = arguments.parse_args()
         self.parse_args(parse)
         self.control = self.generate_dict(parse) 
+        print(self.control)
         self.generate_cache() 
     
     def parse_args(self, parse):
         if parse.message and parse.read or parse.interactive and parse.message or parse.interactive and parse.read or parse.numkeys and parse.message or parse.numkeys and parse.interactive:
-            print('Inalid arguments')
+            print(Fore.RED + 'Error, invalid arguments' + Style.RESET_ALL)
             exit(0)
     
     def generate_folders(self):
+        msg = Fore.GREEN + '[*]' + Style.RESET_ALL
         try:
             os.mkdir('decrypt_folder')
+            print(msg, 'Created folder: decrypt_folder')
         except:
             pass
         try:
             os.mkdir('keys')
+            print(msg, 'Created folder: keys')
         except:
             pass
         try:
             os.mkdir('encrypt_folder')
+            print(msg, 'Created folder: keys')
         except:
             pass
         try:
             os.mkdir('cache')
+            print(msg, 'Created folder: cache')
         except:
             pass
     
@@ -217,7 +218,8 @@ class crypt_and_decrypt:
             with open(self.control['path_to_save'], 'wb') as file:
                 file.write(decrypt_data)
             with open(f'decrypt_folder/{self.date}' if not path else f'decrypt_folder/{path}/{self.date}', 'wb') as file:
-                file.write(decrypt_data)            
+                file.write(decrypt_data)
+            
                 
         else:
             print(decrypt_data.decode())
@@ -265,3 +267,4 @@ class crypt_and_decrypt:
 if __name__ == '__main__':
     start = crypt_and_decrypt()
     start.main()
+    
