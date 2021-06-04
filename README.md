@@ -87,6 +87,19 @@ python3 main.py -f d -p path_to_folder -s
 ```bash
 python3 min.py -g
 ```
+
+#### Encrypting a folder with a specific key
+
+```bash
+python main.py -f e -p path_to_folder  -k 10
+```
+
+#### Decrypting a folder with a specific key
+
+```bash
+python3 main.py -f d -p path_to_folder -s -k 3
+```
+
 ## How to Contribute
 
 1. Clone repo and create a new branch
