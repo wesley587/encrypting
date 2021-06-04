@@ -1,10 +1,17 @@
-from cryptography.fernet import Fernet
 import os
 import argparse
 import subprocess
 from datetime import datetime
 from json import dumps
 from colorama import Back, Fore, Style
+
+first_execution = True
+if first_execution:
+    install_lib = os.popen('pip3 install cryptography')
+    if not 'Requirement already satisfied' in install_lib.read():
+        print(f'[{Fore.GREEN + "*" + Style.RESET_ALL} successful installing cryptography')
+
+from cryptography.fernet import Fernet
 
 
 arguments = argparse.ArgumentParser()
