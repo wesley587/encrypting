@@ -4,12 +4,15 @@ import subprocess
 from datetime import datetime
 from json import dumps
 from colorama import Back, Fore, Style
-
 first_execution = True
 if first_execution:
+    print(f'[{Fore.GREEN + "*" + Style.RESET_ALL}] Checking if cryptography module exists')
     install_lib = os.popen('pip3 install cryptography')
     if not 'Requirement already satisfied' in install_lib.read():
-        print(f'[{Fore.GREEN + "*" + Style.RESET_ALL} successful installing cryptography')
+        print(f'[{Fore.GREEN + "*" + Style.RESET_ALL}] Successful installing cryptography module')
+    else:
+        print(f'[{Fore.GREEN + "*" + Style.RESET_ALL}] Cryptography module already exists')
+
 
 from cryptography.fernet import Fernet
 
@@ -276,17 +279,20 @@ class crypt_and_decrypt:
         else:
             file_to_read = self.control['path_to_read']
         print(f'Reading the file on : {Fore.LIGHTCYAN_EX + file_to_read + Style.RESET_ALL}')
+        try:
+            with open(file_to_read, 'rb') as file:
+                secret = self.reading_secret()
+                decrypt_data = secret.decrypt(file.read())
+            if self.control['save_output']:
+                print(f'Salving file: {Fore.GREEN + self.control["path_to_save"] + Style.RESET_ALL} ')
 
-        with open(file_to_read, 'rb') as file:
-            secret = self.reading_secret()
-            decrypt_data = secret.decrypt(file.read())
-        if self.control['save_output']:
-            print(f'Salving file: {Fore.GREEN + self.control["path_to_save"] + Style.RESET_ALL} ')
+                with open(self.control['path_to_save'], 'wb') as file:
+                    file.write(decrypt_data)
+                with open(f'decrypt_folder/{self.date}' if not path else f'decrypt_folder/{path}/{self.date}', 'wb') as file:
+                    file.write(decrypt_data)
+        except:
+            print(f'{Fore.RED + "ERROR, Impossible encrypt the file: " + Style.RESET_ALL + self.control["path_to_save"]}')
 
-            with open(self.control['path_to_save'], 'wb') as file:
-                file.write(decrypt_data)
-            with open(f'decrypt_folder/{self.date}' if not path else f'decrypt_folder/{path}/{self.date}', 'wb') as file:
-                file.write(decrypt_data)            
                 
         else:
             print(f'content: {Fore.RED + decrypt_data.decode() + Style.RESET_ALL}')
@@ -313,10 +319,11 @@ class crypt_and_decrypt:
             try:
                 with open(self.control['path_to_read'], 'r') as file:
                     self.control['content'] = file.read()
+                    self.encrypt_msg() if not path else self.encrypt_msg(path)
             except:
                 print(f'{Fore.RED + "ERROR, Impossible encrypt the file: " + Style.RESET_ALL + self.control["path_to_save"]}')
 
-            self.encrypt_msg() if not path else self.encrypt_msg(path)
+            
             
         else:
             print('Pass the -p parram to inform the path of file')
