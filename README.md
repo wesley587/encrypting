@@ -2,16 +2,16 @@
 
 ![pgp-encryption-hero](https://user-images.githubusercontent.com/72465364/120722465-263bca80-c4a6-11eb-9b42-3be790f8b388.png)
 
-# What is Encrypting
+## What is Encrypting
 
 Encrypt project is 100% written in python language.
 It's used to encrypt and decrypt files and folders.
 
-# usage
+## usage
 
 To start the use of this project clone the [repos](ttps://github.com/wesley587/encrypting) or copy the [main.py](ttps://github.com/wesley587/encrypting/blob/main/main.py)
 
-# Commands
+## Commands
 
 | command | details | how to use |
 | - | - | - |
@@ -24,47 +24,47 @@ To start the use of this project clone the [repos](ttps://github.com/wesley587/e
 | s | Used to save the output | -s |
 | n | Used to see the Keys | -n |
 
-# Examples
+## Examples
 
 Some examples using this project
 
-### Using the interactive mode
+#### Using the interactive mode
 
 ```shell
 python3 main.py -i
 ```
 
-### Writing an encrypting file
+#### Writing an encrypting file
 
 ```shell
 python3 main.py -w 'Write an encrypt message'
 ```
 
-### Reading an encrypting file
+#### Reading an encrypting file
 
 ```shell
 python3 main.py -r [path or default] -s
 ```
 
-### Seeing the keys
+#### Seeing the keys
 
 ```shell
 python3 main.py -n
 ```
 
-### Encrypting a folder
+#### Encrypting a folder
 
 ```shell
 python main.py -f e -p path_to_folder 
 ```
 
-### Decrypting a folder
+#### Decrypting a folder
 
 ```shell
 python3 main.py -f d -p path_to_folder -s
 ```
 
-### Generate a new key
+#### Generate a new key
 
 ```shell
 python3 min.py -g
