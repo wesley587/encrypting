@@ -4,15 +4,18 @@ import subprocess
 from datetime import datetime
 from json import dumps
 from colorama import Back, Fore, Style
+
+
 first_execution = True
 if first_execution:
     print(f'[{Fore.GREEN + "*" + Style.RESET_ALL}] Checking if cryptography module exists')
-    install_lib = os.popen('pip3 install cryptography')
-    if not 'Requirement already satisfied' in install_lib.read():
+    validation = os.popen('pip3 show cryptography').read()
+    if not validation:
+        print(f'[{Fore.GREEN + "*" + Style.RESET_ALL}] Installing cryptography module')
+        install_lib = os.system('pip3 install cryptography')
         print(f'[{Fore.GREEN + "*" + Style.RESET_ALL}] Successful installing cryptography module')
     else:
         print(f'[{Fore.GREEN + "*" + Style.RESET_ALL}] Cryptography module already exists')
-
 
 from cryptography.fernet import Fernet
 
@@ -37,7 +40,21 @@ arguments.add_argument('-n --numkeys', dest='numkeys', help='Show all keys on ke
 
 arguments.add_argument('-e --exist', default=False, dest='exist', help='Encrypt using a exist file', nargs='?', const=True)
 
-arguments.add_argument('-f --folder', default=False, dest='folder', help='Used to encrypt or decrypt a folder')
+arguments.add_argument('-f --folder', default=False, dest='folder', help='Used to encrypt or decrypt a folder use e(encrypt) d(decrypt)')
+
+arguments.add_argument('-h --help', default='''                       ---- Argumets ----
+        ================================================
+                    -r --read -R - Read     Read an encrypted file, it is possible to pass the path a file
+                    -w --write -W --Write   Write a message encrypt, pass the content
+                    -i --interactive        Interactie mode
+                    -s --save               Save the stdout in a file
+                    -p --path               Inform the path to do something
+                    -g --generatekey        Generate new key value
+                    -k --key                Key that will be used in the process
+                    -n --numkeys            Show all keys on keys folder
+                    -e --exist              Encrypt using a exist file
+                    -f --folder             Used to encrypt or decrypt a folder use e(encrypt) d(decrypt)
+                    ''', dest='help', help='help mode')
 
 
 class crypt_and_decrypt:
@@ -64,6 +81,11 @@ class crypt_and_decrypt:
         if parse.message and parse.read or parse.interactive and parse.message or parse.interactive and parse.read or parse.numkeys and parse.message or parse.numkeys and parse.interactive:
             print(Fore.RED + 'Error, invalid arguments' + Style.RESET_ALL)
             exit(0)
+        if not parse.message and not parse.read and not parse.interactive  and not parse.numkeys:
+            print(Fore.RED + 'Error, invalid arguments' + Style.RESET_ALL)
+            print(parse.help)
+            exit(0)
+
     
     def generate_folders(self):
         msg = Fore.GREEN + '[*]' + Style.RESET_ALL
