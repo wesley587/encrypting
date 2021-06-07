@@ -81,7 +81,7 @@ class crypt_and_decrypt:
         if parse.message and parse.read or parse.interactive and parse.message or parse.interactive and parse.read or parse.numkeys and parse.message or parse.numkeys and parse.interactive:
             print(Fore.RED + 'Error, invalid arguments' + Style.RESET_ALL)
             exit(0)
-        if not parse.message and not parse.read and not parse.interactive  and not parse.numkeys:
+        if not parse.message and not parse.read and not parse.interactive  and not parse.numkeys and not parse.exist:
             print(Fore.RED + 'Error, invalid arguments' + Style.RESET_ALL)
             print(parse.help)
             exit(0)
