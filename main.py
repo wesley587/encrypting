@@ -42,7 +42,7 @@ arguments.add_argument('-e --exist', default=False, dest='exist', help='Encrypt 
 
 arguments.add_argument('-f --folder', default=False, dest='folder', help='Used to encrypt or decrypt a folder use e(encrypt) d(decrypt)')
 
-arguments.add_argument('-h --help', default='''                       ---- Argumets ----
+arguments.add_argument('-h --help', default='''                       ---- Arguments ----
         ================================================
                     -r --read -R - Read     Read an encrypted file, it is possible to pass the path a file
                     -w --write -W --Write   Write a message encrypt, pass the content
