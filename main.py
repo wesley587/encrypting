@@ -34,7 +34,7 @@ arguments.add_argument('-p --path', dest='path', help='Inform the path to do som
 
 arguments.add_argument('-g --generatekey', dest='new_key', nargs='?', const=True, help='Generate new key value')
 
-arguments.add_argument('-k --key', default='secret.key', dest='key', help='Key that will be used in the process')
+arguments.add_argument('-k --key', default='Default.key', dest='key', help='Key that will be used in the process')
 
 arguments.add_argument('-n --numkeys', dest='numkeys', help='Show all keys on keys folder', const=True, nargs='?', default=False)
 
@@ -248,7 +248,7 @@ class crypt_and_decrypt:
                 values_dict['save_output'] = False
             if values_dict['action'] == 'write' or values_dict['action'] == 'read' or values_dict['action'] == 'folder' or values_dict['action'] == 'existing file':
                 keys = self.infokes(show=False, storage=True)
-                values_dict['key'] = {'default': v for k, v in keys.items() if k == parse.key}['default'] if parse.key != 'secret.key' else parse.key
+                values_dict['key'] = {'default': v for k, v in keys.items() if k == parse.key}['default'] if parse.key != 'Default.key' else parse.key
                 print(f'Using key: {Fore.LIGHTGREEN_EX +  values_dict["key"] + Style.RESET_ALL}')
             
             
@@ -257,7 +257,7 @@ class crypt_and_decrypt:
 
     def generate_key(self):
         encrypt_key = Fernet.generate_key()            
-        with open('keys/secret.key', 'wb') as file:
+        with open('keys/Default.key', 'wb') as file:
             file.write(encrypt_key)
         with open(f'keys/{self.date}.key', 'wb') as file:
             file.write(encrypt_key)
