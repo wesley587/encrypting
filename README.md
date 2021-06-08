@@ -3,7 +3,6 @@
 ![pgp-encryption-hero](https://user-images.githubusercontent.com/72465364/120722465-263bca80-c4a6-11eb-9b42-3be790f8b388.png)
 ![shield](https://img.shields.io/badge/python-3.8.5-orange)
 ![shield](https://img.shields.io/badge/platform-windows%20%7C%20linux-orange)
-![shield](https://img.shields.io/badge/pip3-20.0.2-orange)
 
 ## What is Encrypting
 
