@@ -4,9 +4,8 @@ import subprocess
 from datetime import datetime
 from json import dumps
 from colorama import Back, Fore, Style
+from platform import platform
 
-
-first_execution = True
 if first_execution:
     print(f'[{Fore.GREEN + "*" + Style.RESET_ALL}] Checking if cryptography module exists')
     validation = os.popen('pip3 show cryptography').read()
@@ -59,7 +58,7 @@ arguments.add_argument('-h --help', default='''                       ---- Argum
 
 class crypt_and_decrypt:
     def __init__(self):
-        self.date = datetime.now().strftime('%d-%m-%y %H:%M:%S')
+        self.date = datetime.now().strftime('%d-%m-%y %H-%M-%S')
         first_execution = True
         if first_execution:
             self.generate_folders()
@@ -321,7 +320,7 @@ class crypt_and_decrypt:
     
     def infokes(self, show=True, storage=False):
         key_info = dict()
-        stdout = subprocess.check_output(['ls', 'keys']).decode().replace('\n', ', ').split(', ')
+        stdout = os.listdir('keys')
         if show:
             print(Fore.RED + '     ----- Keys -----' + Style.RESET_ALL)
             print('='*30)
@@ -363,7 +362,7 @@ class crypt_and_decrypt:
                         print(f'Created folder: {Fore.RED}encrypt_folder/{root[root.find(folder):]}{Style.RESET_ALL}')
                     except:
                         pass
-                    self.date = datetime.now().strftime('%d-%m-%y %H:%M:%S:%f')
+                    self.date = datetime.now().strftime('%d-%m-%y %H-%M-%S-%f')
                     self.encrypt_file(path=root[root.find(folder):])
                 elif self.control['folder_action'] == 'decrypt':
                     try:
@@ -371,7 +370,7 @@ class crypt_and_decrypt:
                         print(f'Created folder: {Fore.RED}encrypt_folder/{root[root.find(folder):]}{Style.RESET_ALL}')
                     except:
                         pass
-                    self.date = datetime.now().strftime('%d-%m-%y %H:%M:%S:%f')
+                    self.date = datetime.now().strftime('%d-%m-%y %H-%M-%S-%f')
                     self.read = f'{root}/{file}'
                     self.decrypt_msg(path=root[root.find(folder):])
                 
