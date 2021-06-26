@@ -3,18 +3,18 @@ import argparse
 import subprocess
 from datetime import datetime
 from json import dumps
-from colorama import Back, Fore, Style
 from platform import platform
 
+first_execution = True
 if first_execution:
-    print(f'[{Fore.GREEN + "*" + Style.RESET_ALL}] Checking if cryptography module exists')
+    print('[*] Checking if cryptography module exists')
     validation = os.popen('pip3 show cryptography').read()
     if not validation:
-        print(f'[{Fore.GREEN + "*" + Style.RESET_ALL}] Installing cryptography module')
-        install_lib = os.system('pip3 install cryptography')
-        print(f'[{Fore.GREEN + "*" + Style.RESET_ALL}] Successful installing cryptography module')
+        print(f'[info] Installing cryptography module')
+        os.system('pip3 install cryptography')
+        print(f'[info] Successful installing cryptography module')
     else:
-        print(f'[{Fore.GREEN + "*" + Style.RESET_ALL}] Cryptography module already exists')
+        print(f'[info] Cryptography module already exists')
 
 from cryptography.fernet import Fernet
 
@@ -78,38 +78,36 @@ class crypt_and_decrypt:
     
     def parse_args(self, parse):
         if parse.message and parse.read or parse.interactive and parse.message or parse.interactive and parse.read or parse.numkeys and parse.message or parse.numkeys and parse.interactive:
-            print(Fore.RED + 'Error, invalid arguments' + Style.RESET_ALL)
+            print('[Error] Error, invalid arguments')
             exit(0)
-        if not parse.message and not parse.read and not parse.interactive  and not parse.numkeys and not parse.exist:
-            print(Fore.RED + 'Error, invalid arguments' + Style.RESET_ALL)
+        if not parse.message and not parse.read and not parse.interactive  and not parse.numkeys and not parse.exist and not parse.new_key:
+            print('[Error] Error, invalid arguments')
             print(parse.help)
             exit(0)
 
     
     def generate_folders(self):
-        msg = Fore.GREEN + '[*]' + Style.RESET_ALL
-        
         try:
             os.mkdir('decrypt_folder')
-            print(msg, 'Created folder: decrypt_folder')
+            print('[*] Created folder: decrypt_folder')
         except:
             pass
         
         try:
             os.mkdir('keys')
-            print(msg, 'Created folder: keys')
+            print('[*] Created folder: keys')
         except:
             pass
         
         try:
             os.mkdir('encrypt_folder')
-            print(msg, 'Created folder: keys')
+            print('[*] Created folder: keys')
         except:
             pass
         
         try:
             os.mkdir('cache')
-            print(msg, 'Created folder: cache')
+            print('[*] Created folder: cache')
         except:
             pass
     
@@ -117,20 +115,20 @@ class crypt_and_decrypt:
         data = dumps(self.control)
         with open(f'cache/{self.date}.json', 'w') as file:
             file.write(data)
-        print(f'[{Fore.GREEN + "*" + Style.RESET_ALL}] Salving cache...')
+        print(f'[*] Salving cache...')
         
     def generate_dict(self, parse):
         values_dict = dict()
         
         if parse.interactive:
             print('   ----- Actions -----')
-            print(f'[{Fore.LIGHTGREEN_EX + "w" + Style.RESET_ALL}] = write \n[{Fore.LIGHTGREEN_EX + "r" + Style.RESET_ALL}] = read \n[{Fore.LIGHTGREEN_EX + "n" + Style.RESET_ALL}] = view the keys \n[{Fore.LIGHTGREEN_EX + "g" + Style.RESET_ALL}] = generate a new key \n[{Fore.LIGHTGREEN_EX + "e" + Style.RESET_ALL}] = encrypt an existing file \n[{Fore.LIGHTGREEN_EX + "f" + Style.RESET_ALL}] = folder')
+            print(f'[w] = write \n[r] = read \n[n] = view the keys \n[g] = generate a new key \n[e] = encrypt an existing file \n[f] = folder')
             
             action = str(input('What do you want to do? ')).lower().strip()[0]
             if action == 'r':
                 print('   ---- Reading mode ----')
                 values_dict['action'] = 'read'
-                print(f'[{Fore.LIGHTGREEN_EX + "default" + Style.RESET_ALL}] = encrypt_folder/encrypt_data.txt')
+                print(f'[default] = encrypt_folder/encrypt_data.txt')
                 values_dict['path_to_read'] = str(input('Path to read the file: '))
                 values_dict['save_output'] = True if str(input('Save the output? [y/n] ')).lower().strip()[0] == 'y'  else False
                 
@@ -155,13 +153,13 @@ class crypt_and_decrypt:
                     values_dict['path_to_save'] = 'encrypt_folder/encrypt_data.txt'
                     
             elif action == 'n':
-                self.infokes()
+                self.infokeys()
                 exit(0)
             elif action == 'g':
                 values_dict['action'] = 'Generate key'
-                print(Fore.GREEN + 'Generating new Key')
+                print('Generating new Key')
                 self.generate_key()
-                print('Success in creationg key' + Style.RESET_ALL)
+                print('Success in key creation')
             elif action == 'e':
                 print('  ----- Existe file mode -----')
                 values_dict['action'] = 'existing file'
@@ -171,7 +169,7 @@ class crypt_and_decrypt:
                 values_dict['action'] = 'folder'
                 self.exist = False
                 values_dict['folder_path'] = str(input('folder path: '))
-                print(f'[{Fore.LIGHTGREEN_EX + "e" + Style.RESET_ALL}] = Encrypt \n[{Fore.LIGHTGREEN_EX + "d" + Style.RESET_ALL}] = Decrypt')
+                print(f'[e] = Encrypt \n[d] = Decrypt')
                 action = str(input('Encripty ou decripty? [e/d] ')).lower().strip()[0]
                 if action == 'd':
                     values_dict['folder_action'] = 'decrypt'
@@ -179,36 +177,36 @@ class crypt_and_decrypt:
                 elif action == 'e':
                     values_dict['folder_action'] = 'encrypt'
                 else:
-                    print(Fore.RED + 'ERROR, INVALID ACTION...' + Style.RESET_ALL)
+                    print('[Error] ERROR, INVALID ACTION...')
                     exit(0)
             else:
-                print(Fore.RED + 'ERROR, INVALID ACTION...' + Style.RESET_ALL)
+                print('[Error] ERROR, INVALID ACTION...')
                 exit(0)
             if values_dict['action'] == 'write' or values_dict['action'] == 'read' or values_dict['action'] == 'folder' or values_dict['action'] == 'existing file':
-                keys = self.infokes(storage=True)
+                keys = self.infokeys(storage=True)
                 key = str(input('Key that will be used in the action: '))
                 values_dict['key'] = {'default': v for k, v in keys.items() if k == key}['default'] 
         else:            
             if parse.numkeys or parse.new_key:
                 if parse.numkeys:
                     values_dict['action'] = 'View keys'
-                    self.infokes()
+                    self.infokeys()
         
                 if parse.new_key:
                     values_dict['action'] = 'Generate key'
-                    print(f'[{Fore.GREEN + "*" + Style.RESET_ALL}] Generating new Key')
+                    print(f'[*] Generating new Key')
                     self.generate_key()
-                    print('Success in creationg key')
+                    print('[Info] Success in creationg key')
         
             elif parse.folder:
                 values_dict['action'] = 'folder'
                 if parse.folder.lower() == 'e' or parse.folder.lower() == 'encrypt':
                     values_dict['folder_action'] = 'encrypt' 
-                    print(f'[{Fore.GREEN + "*" + Style.RESET_ALL}] Encrypting folder')
+                    print(f'[*] Encrypting folder')
                 elif parse.folder.lower() == 'd' or parse.folder.lower() == 'decrypt':
                     values_dict['folder_action'] = 'decrypt'
                     values_dict['save_output'] = True            
-                    print(f'[{Fore.GREEN + "*" + Style.RESET_ALL}] Decrypting folder')
+                    print(f'[*] Decrypting folder')
 
                 values_dict['folder_path'] = values_dict['path_to_read'] = parse.path
                 
@@ -216,11 +214,11 @@ class crypt_and_decrypt:
             elif parse.exist:
                 values_dict['action'] = 'existing file'
                 values_dict['path_to_read'] = values_dict['path_to_save'] = parse.path
-                print(f'[{Fore.GREEN + "*" + Style.RESET_ALL}] Encrypting file')
+                print(f'[*] Encrypting file')
 
                 
             elif parse.message:
-                print(f'[{Fore.GREEN + "*" + Style.RESET_ALL}] Encrypting message')
+                print(f'[*] Encrypting message')
                 values_dict['action'] = 'write'
                 values_dict['content'] = parse.message
                 values_dict['save_output'] = True if parse.save else False
@@ -230,7 +228,7 @@ class crypt_and_decrypt:
             elif parse.read:
                 values_dict['action'] = 'read'
                 values_dict['path_to_read'] = 'default' if parse.read else parse.read
-                print(f'[{Fore.GREEN + "*" + Style.RESET_ALL}] Reading encrypting message')
+                print(f'[*] Reading encrypting message')
 
 
             if parse.save:
@@ -240,15 +238,15 @@ class crypt_and_decrypt:
 
                 else:
                     values_dict['path_to_save'] = parse.path
-                print(f'Save the file on : {Fore.LIGHTCYAN_EX + values_dict["path_to_save"] + Style.RESET_ALL}')
+                print(f'[Info] Save the file on : {values_dict["path_to_save"]}')
 
                     
             elif not parse.save:
                 values_dict['save_output'] = False
             if values_dict['action'] == 'write' or values_dict['action'] == 'read' or values_dict['action'] == 'folder' or values_dict['action'] == 'existing file':
-                keys = self.infokes(show=False, storage=True)
+                keys = self.infokeys(show=False, storage=True)
                 values_dict['key'] = {'default': v for k, v in keys.items() if k == parse.key}['default'] if parse.key != 'Default.key' else parse.key
-                print(f'Using key: {Fore.LIGHTGREEN_EX +  values_dict["key"] + Style.RESET_ALL}')
+                print(f'[Info] Using key: {values_dict["key"]}')
             
             
             
@@ -273,7 +271,7 @@ class crypt_and_decrypt:
             elif self.control['action'] == 'read':
                 self.decrypt_msg()
         else:
-            print('error...')
+            print('[Error] error...')
          
     def reading_secret(self):
         with open(f'keys/{self.control["key"]}', 'rb') as file:
@@ -283,9 +281,9 @@ class crypt_and_decrypt:
     def encrypt_msg(self, path=False):      
         secret = self.reading_secret()
         if not path:
-            print(f'Salving file on: {Fore.GREEN + self.control["path_to_save"] + Style.RESET_ALL} ')
+            print(f'[Info] Salving file on: {self.control["path_to_save"]} ')
         else:
-            print(f'Salving file on: {Fore.GREEN + f"encrypt_folder/{path}" + Style.RESET_ALL} ')
+            print(f'[Info] Salving file on: encrypt_folder/{path}')
         with open(self.control['path_to_save'], 'wb') as file:
             encrypt_data = secret.encrypt(self.control['content'].encode())
             file.write(encrypt_data)
@@ -299,35 +297,35 @@ class crypt_and_decrypt:
             file_to_read = 'encrypt_folder/encrypt_data.txt'
         else:
             file_to_read = self.control['path_to_read']
-        print(f'Reading the file on : {Fore.LIGHTCYAN_EX + file_to_read + Style.RESET_ALL}')
+        print(f'[Info] Reading the file on : {file_to_read}')
         try:
             with open(file_to_read, 'rb') as file:
                 secret = self.reading_secret()
                 decrypt_data = secret.decrypt(file.read())
             if self.control['save_output']:
-                print(f'Salving file: {Fore.GREEN + self.control["path_to_save"] + Style.RESET_ALL} ')
+                print(f'[Info] Salving file: {self.control["path_to_save"]} ')
 
                 with open(self.control['path_to_save'], 'wb') as file:
                     file.write(decrypt_data)
                 with open(f'decrypt_folder/{self.date}' if not path else f'decrypt_folder/{path}/{self.date}', 'wb') as file:
                     file.write(decrypt_data)
         except:
-            print(f'{Fore.RED + "ERROR, Impossible encrypt the file: " + Style.RESET_ALL + self.control["path_to_save"]}')
+            print(f'[Error] ERROR, Impossible encrypt the file: {self.control["path_to_save"]}')
 
                 
         else:
-            print(f'content: {Fore.RED + decrypt_data.decode() + Style.RESET_ALL}')
+            print(f'[Content] content: {decrypt_data.decode()}\n')
     
-    def infokes(self, show=True, storage=False):
+    def infokeys(self, show=True, storage=False):
         key_info = dict()
         stdout = os.listdir('keys')
         if show:
-            print(Fore.RED + '     ----- Keys -----' + Style.RESET_ALL)
+            print('     ----- Keys -----')
             print('='*30)
         for x in range(0, len(stdout)):
             if stdout[x]:
                 if show:
-                    print(f'[{Fore.RED +  str(x) + Style.RESET_ALL}] {stdout[x]}')
+                    print(f'[{x}] {stdout[x]}')
                 if storage:
                     key_info[str(x)] = stdout[x]
         if show:
@@ -335,14 +333,14 @@ class crypt_and_decrypt:
         return key_info
 
     def encrypt_file(self, path=False):
-        print(f'Reading the file on : {Fore.LIGHTCYAN_EX + self.control["path_to_read"] + Style.RESET_ALL}')
+        print(f'Reading the file on : {self.control["path_to_read"]}')
         if self.control['path_to_read']:
             try:
                 with open(self.control['path_to_read'], 'r') as file:
                     self.control['content'] = file.read()
                     self.encrypt_msg() if not path else self.encrypt_msg(path)
             except:
-                print(f'{Fore.RED + "ERROR, Impossible encrypt the file: " + Style.RESET_ALL + self.control["path_to_save"]}')
+                print(f'[Error] ERROR, Impossible encrypt the file: {self.control["path_to_save"]}')
 
             
             
@@ -359,7 +357,7 @@ class crypt_and_decrypt:
                 if self.control['folder_action'] == 'encrypt':
                     try:
                         os.mkdir(f'encrypt_folder/{root[root.find(folder):]}')
-                        print(f'Created folder: {Fore.RED}encrypt_folder/{root[root.find(folder):]}{Style.RESET_ALL}')
+                        print(f'[info] Created folder: encrypt_folder/{root[root.find(folder):]}')
                     except:
                         pass
                     self.date = datetime.now().strftime('%d-%m-%y %H-%M-%S-%f')
@@ -367,7 +365,7 @@ class crypt_and_decrypt:
                 elif self.control['folder_action'] == 'decrypt':
                     try:
                         os.mkdir(f'decrypt_folder/{root[root.find(folder):]}')
-                        print(f'Created folder: {Fore.RED}encrypt_folder/{root[root.find(folder):]}{Style.RESET_ALL}')
+                        print(f'[Info] Created folder: encrypt_folder/{root[root.find(folder):]}')
                     except:
                         pass
                     self.date = datetime.now().strftime('%d-%m-%y %H-%M-%S-%f')
